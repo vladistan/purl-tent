@@ -1,0 +1,62 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: purl-tent
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: purl-tent
+  name: purl-tent
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: purl-tent
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: purl-tent
+    spec:
+      containers:
+      - image: vladistan/purl-tent:0.1
+        imagePullPolicy: Always
+        name: purl-tent
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: purl-tent
+  name: service-purl-tent
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: purl-tent
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: purl-tent
+  name: ingress-purl-tent
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: purl.org
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: service-purl-tent
+              port:
+                number: 80
