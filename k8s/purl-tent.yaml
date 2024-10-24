@@ -20,7 +20,7 @@ spec:
         app.kubernetes.io/name: purl-tent
     spec:
       containers:
-      - image: vladistan/purl-tent:0.1
+      - image: vladistan/purl-tent:0.3
         imagePullPolicy: Always
         name: purl-tent
         ports:
